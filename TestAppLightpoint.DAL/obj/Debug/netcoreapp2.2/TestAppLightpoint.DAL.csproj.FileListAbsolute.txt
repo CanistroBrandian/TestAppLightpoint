@@ -1,0 +1,9 @@
+C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint.DAL\bin\Debug\netcoreapp2.2\TestAppLightpoint.DAL.deps.json
+C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint.DAL\bin\Debug\netcoreapp2.2\TestAppLightpoint.DAL.dll
+C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint.DAL\obj\Debug\netcoreapp2.2\TestAppLightpoint.DAL.csprojAssemblyReference.cache
+C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint.DAL\obj\Debug\netcoreapp2.2\TestAppLightpoint.DAL.csproj.CoreCompileInputs.cache
+C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint.DAL\obj\Debug\netcoreapp2.2\TestAppLightpoint.DAL.AssemblyInfoInputs.cache
+C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint.DAL\obj\Debug\netcoreapp2.2\TestAppLightpoint.DAL.AssemblyInfo.cs
+C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint.DAL\bin\Debug\netcoreapp2.2\TestAppLightpoint.DAL.pdb
+C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint.DAL\obj\Debug\netcoreapp2.2\TestAppLightpoint.DAL.dll
+C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint.DAL\obj\Debug\netcoreapp2.2\TestAppLightpoint.DAL.pdb
