@@ -4721,6 +4721,19 @@
           "lib/netstandard1.3/System.Xml.XPath.XDocument.dll": {}
         }
       },
+      "TestAppLightpoint.BLL/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v2.2",
+        "dependencies": {
+          "TestAppLightpoint.DAL": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/TestAppLightpoint.BLL.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/TestAppLightpoint.BLL.dll": {}
+        }
+      },
       "TestAppLightpoint.DAL/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.2",
@@ -12956,6 +12969,11 @@
         "system.xml.xpath.xdocument.nuspec"
       ]
     },
+    "TestAppLightpoint.BLL/1.0.0": {
+      "type": "project",
+      "path": "../TestAppLightpoint.BLL/TestAppLightpoint.BLL.csproj",
+      "msbuildProject": "../TestAppLightpoint.BLL/TestAppLightpoint.BLL.csproj"
+    },
     "TestAppLightpoint.DAL/1.0.0": {
       "type": "project",
       "path": "../TestAppLightpoint.DAL/TestAppLightpoint.DAL.csproj",
@@ -12968,7 +12986,7 @@
       "Microsoft.AspNetCore.Razor.Design >= 2.2.0",
       "Microsoft.NETCore.App >= 2.2.0",
       "Microsoft.VisualStudio.Web.CodeGeneration.Design >= 2.2.4",
-      "TestAppLightpoint.DAL >= 1.0.0"
+      "TestAppLightpoint.BLL >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -13001,8 +13019,8 @@
       "frameworks": {
         "netcoreapp2.2": {
           "projectReferences": {
-            "C:\\Users\\Павел\\source\\repos\\TestAppLightpoint\\TestAppLightpoint.DAL\\TestAppLightpoint.DAL.csproj": {
-              "projectPath": "C:\\Users\\Павел\\source\\repos\\TestAppLightpoint\\TestAppLightpoint.DAL\\TestAppLightpoint.DAL.csproj"
+            "C:\\Users\\Павел\\source\\repos\\TestAppLightpoint\\TestAppLightpoint.BLL\\TestAppLightpoint.BLL.csproj": {
+              "projectPath": "C:\\Users\\Павел\\source\\repos\\TestAppLightpoint\\TestAppLightpoint.BLL\\TestAppLightpoint.BLL.csproj"
             }
           }
         }

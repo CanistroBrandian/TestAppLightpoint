@@ -11,13 +11,14 @@ namespace TestAppLightpoint.BLL.Services
     public class StoreService : IStoreService
     {
         private readonly IUnitOfWork _uow;
-        private readonly ICommonRepository<Store> _repositoryStore;
+        private readonly IStoreRepository _repositoryStore;
 
-        public StoreService(IUnitOfWork unitOfWork, ICommonRepository<Store> repo)
+        public StoreService(IUnitOfWork unitOfWork, IStoreRepository repo)
         {
             _uow = unitOfWork;
             _repositoryStore = repo;
         }
+
         public async Task CreateStoreAsync(StoreDTO item)
         {
             if (item != null)
@@ -45,9 +46,9 @@ namespace TestAppLightpoint.BLL.Services
             return await _repositoryStore.GetAllAsync();
         }
 
-        public Task<Store> GetSingleStoreAsync(int id)
+        public async Task<Store> GetSingleStoreAsync(int id)
         {
-            throw new NotImplementedException();
+           return await _repositoryStore.GetSingleAsync(id);
         }
 
         public void UpdateStore(StoreDTO item)

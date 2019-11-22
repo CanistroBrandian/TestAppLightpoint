@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TestAppLightpoint.DAL\TestAppLightpoint.DAL.csproj" />
-    <ProjectReference Include="..\TestAppLightpoint\TestAppLightpoint.Web.csproj" />
   </ItemGroup>
 
 </Project>

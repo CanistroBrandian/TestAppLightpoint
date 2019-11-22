@@ -12,5 +12,6 @@ namespace TestAppLightpoint.BLL.Interfaces
         void UpdateProduct(ProductDTO item);
         Task DeleteProductAsync(int id);
         Task CreateProductAsync(ProductDTO item);
+        Task<IEnumerable<ProductDTO>> GetAllProductsOfStore(int storeId);
     }
 }

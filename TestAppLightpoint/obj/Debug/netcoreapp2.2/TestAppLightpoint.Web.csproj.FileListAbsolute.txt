@@ -30,6 +30,8 @@ C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint\obj\Debug\n
 C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint\obj\Debug\netcoreapp2.2\TestAppLightpoint.Web.csproj.CopyComplete
 C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint\bin\Debug\netcoreapp2.2\TestAppLightpoint.DAL.dll
 C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint\bin\Debug\netcoreapp2.2\TestAppLightpoint.DAL.pdb
+C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint\bin\Debug\netcoreapp2.2\TestAppLightpoint.BLL.dll
+C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint\bin\Debug\netcoreapp2.2\TestAppLightpoint.BLL.pdb
 C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint\obj\Debug\netcoreapp2.2\Razor\Views\Products\Create.g.cshtml.cs
 C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint\obj\Debug\netcoreapp2.2\Razor\Views\Products\Delete.g.cshtml.cs
 C:\Users\Павел\source\repos\TestAppLightpoint\TestAppLightpoint\obj\Debug\netcoreapp2.2\Razor\Views\Products\Details.g.cshtml.cs

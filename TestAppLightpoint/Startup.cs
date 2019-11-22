@@ -10,7 +10,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TestAppLightpoint.BLL.Interfaces;
+using TestAppLightpoint.BLL.Services;
+using TestAppLightpoint.DAL.Concrate;
 using TestAppLightpoint.DAL.EF;
+using TestAppLightpoint.DAL.Entities;
+using TestAppLightpoint.DAL.Interface;
+using TestAppLightpoint.DAL.Repository;
 
 namespace TestAppLightpoint
 {
@@ -33,7 +39,14 @@ namespace TestAppLightpoint
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IStoreRepository, StoreRepository>();
+            services.AddScoped<IStoreService, StoreService>();
+            services.AddScoped<IProductService, ProductService>();
             services.AddDbContext<EFContext>(options => options.UseSqlServer(connection));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

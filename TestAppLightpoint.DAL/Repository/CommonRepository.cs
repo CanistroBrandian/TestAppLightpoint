@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TestAppLightpoint.DAL.Interface;
 
@@ -43,5 +44,9 @@ namespace TestAppLightpoint.DAL.Repository
             _uow.Context.Set<T>().Attach(item);
         }
 
+        public async Task<IEnumerable<T>> FindList(Func<T, bool> predicate)
+        {
+            return  _uow.Context.Set<T>().Where(predicate).AsEnumerable<T>();
+        }
     }
 }

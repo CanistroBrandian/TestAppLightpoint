@@ -1,54 +1,59 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using TestAppLightpoint.BLL.Interfaces;
 using TestAppLightpoint.DAL.EF;
 using TestAppLightpoint.DAL.Entities;
+using TestAppLightpoint.Web.Models;
 
 namespace TestAppLightpoint.Web.Controllers
 {
     public class StoresController : Controller
     {
         private readonly EFContext _context;
+        private readonly IProductService _productService;
+        private readonly IStoreService _storeService;
 
-        public StoresController(EFContext context)
+
+        public StoresController(EFContext context, IProductService productService,IStoreService storeService)
         {
+            _productService = productService;
+            _storeService = storeService;
             _context = context;
         }
 
         // GET: Stores
         public async Task<IActionResult> Index()
         {
-            var eFContext = _context.Stores.Include(s => s.Product);
-            return View(await eFContext.ToListAsync());
+            return View(await _context.Stores.ToListAsync());
         }
 
         // GET: Stores/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
+          
+            var productDTOs = await _productService.GetAllProductsOfStore(id);
+
+            IEnumerable<ProductViewModel> view = productDTOs.ToList().ConvertAll(t => new ProductViewModel
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Description = t.Description,
+                StoreId = t.StoreId,                
+            });
+            if (productDTOs == null)
             {
                 return NotFound();
             }
 
-            var store = await _context.Stores
-                .Include(s => s.Product)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (store == null)
-            {
-                return NotFound();
-            }
-
-            return View(store);
+            return View(view);
         }
 
         // GET: Stores/Create
         public IActionResult Create()
         {
-            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Id");
             return View();
         }
 
@@ -57,7 +62,7 @@ namespace TestAppLightpoint.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Address,OpeningTimes,ProductId")] Store store)
+        public async Task<IActionResult> Create(Store store)
         {
             if (ModelState.IsValid)
             {
@@ -65,9 +70,10 @@ namespace TestAppLightpoint.Web.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Id", store.ProductId);
             return View(store);
         }
+
+       
 
         // GET: Stores/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -82,7 +88,6 @@ namespace TestAppLightpoint.Web.Controllers
             {
                 return NotFound();
             }
-            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Id", store.ProductId);
             return View(store);
         }
 
@@ -91,7 +96,7 @@ namespace TestAppLightpoint.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Address,OpeningTimes,ProductId")] Store store)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Address,OpeningTimes")] Store store)
         {
             if (id != store.Id)
             {
@@ -118,7 +123,6 @@ namespace TestAppLightpoint.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Id", store.ProductId);
             return View(store);
         }
 
@@ -131,7 +135,6 @@ namespace TestAppLightpoint.Web.Controllers
             }
 
             var store = await _context.Stores
-                .Include(s => s.Product)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (store == null)
             {

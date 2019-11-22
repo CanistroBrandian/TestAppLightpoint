@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace TestAppLightpoint.DAL.Entities
 {
@@ -10,8 +8,6 @@ namespace TestAppLightpoint.DAL.Entities
         public string Name { get; set; }
         public string Address { get; set; }
         public string OpeningTimes { get; set; }
-
-        public int ProductId { get; set; }
-        public Product Product { get; set; }
+        public IEnumerable<Product> Products { get; set; }
     }
 }

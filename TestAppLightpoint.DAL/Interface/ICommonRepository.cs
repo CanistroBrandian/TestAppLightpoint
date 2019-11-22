@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace TestAppLightpoint.DAL.Interface
@@ -12,6 +11,7 @@ namespace TestAppLightpoint.DAL.Interface
         Task CreateAsync(T item);
         void Update(T item);
         Task DeleteAsync(int id);
+        Task<IEnumerable<T>> FindList(Func<T, bool> predicate);
 
     }
 }

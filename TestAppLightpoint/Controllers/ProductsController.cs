@@ -1,28 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+using TestAppLightpoint.BLL.DTO;
+using TestAppLightpoint.BLL.Interfaces;
 using TestAppLightpoint.DAL.EF;
 using TestAppLightpoint.DAL.Entities;
+using TestAppLightpoint.Web.Models;
 
 namespace TestAppLightpoint.Web.Controllers
 {
     public class ProductsController : Controller
     {
         private readonly EFContext _context;
+        private readonly IProductService _productService;
+        private readonly IStoreService _storeService;
 
-        public ProductsController(EFContext context)
+        public ProductsController(EFContext context, IProductService productService,IStoreService storeService )
         {
             _context = context;
+            _productService = productService;
+            _storeService = storeService;
         }
 
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Products.ToListAsync());
+            var eFContext = _context.Products.Include(p => p.Store);
+            return View(await eFContext.ToListAsync());
         }
 
         // GET: Products/Details/5
@@ -34,6 +40,7 @@ namespace TestAppLightpoint.Web.Controllers
             }
 
             var product = await _context.Products
+                .Include(p => p.Store)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {
@@ -44,9 +51,13 @@ namespace TestAppLightpoint.Web.Controllers
         }
 
         // GET: Products/Create
-        public IActionResult Create()
+        public IActionResult Create(int storeId)
         {
-            return View();
+            Product product = new Product
+            {
+                StoreId = storeId
+            };
+            return View(product);
         }
 
         // POST: Products/Create
@@ -54,16 +65,24 @@ namespace TestAppLightpoint.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Product product)
+        public async Task<IActionResult> Create(int storeId, ProductViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(product);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ProductDTO productDTO = new ProductDTO
+                {
+
+                    Name = viewModel.Name,
+                    Description = viewModel.Description,
+                    StoreId = storeId,
+                    Store = await _storeService.GetSingleStoreAsync(storeId)
+                };
+                await _productService.CreateProductAsync(productDTO);
+                return RedirectToAction(nameof(Index)); ;
             }
-            return View(product);
+            else return View();
         }
+
 
         // GET: Products/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -78,6 +97,7 @@ namespace TestAppLightpoint.Web.Controllers
             {
                 return NotFound();
             }
+            ViewData["StoreId"] = new SelectList(_context.Stores, "Id", "Id", product.StoreId);
             return View(product);
         }
 
@@ -86,7 +106,7 @@ namespace TestAppLightpoint.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,StoreId")] Product product)
         {
             if (id != product.Id)
             {
@@ -113,6 +133,7 @@ namespace TestAppLightpoint.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["StoreId"] = new SelectList(_context.Stores, "Id", "Id", product.StoreId);
             return View(product);
         }
 
@@ -125,6 +146,7 @@ namespace TestAppLightpoint.Web.Controllers
             }
 
             var product = await _context.Products
+                .Include(p => p.Store)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {
