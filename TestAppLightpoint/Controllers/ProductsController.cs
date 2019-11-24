@@ -1,25 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TestAppLightpoint.BLL.DTO;
 using TestAppLightpoint.BLL.Interfaces;
 using TestAppLightpoint.DAL.EF;
-using TestAppLightpoint.DAL.Entities;
 using TestAppLightpoint.Web.Models;
 
 namespace TestAppLightpoint.Web.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly EFContext _context;
         private readonly IProductService _productService;
         private readonly IStoreService _storeService;
 
-        public ProductsController(EFContext context, IProductService productService,IStoreService storeService )
+        public ProductsController(IProductService productService, IStoreService storeService)
         {
-            _context = context;
             _productService = productService;
             _storeService = storeService;
         }
@@ -27,8 +24,16 @@ namespace TestAppLightpoint.Web.Controllers
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            var eFContext = _context.Products.Include(p => p.Store);
-            return View(await eFContext.ToListAsync());
+            var listProductsDTO = await _productService.GetAllProductAsync();
+            IEnumerable<ProductViewModel> view = listProductsDTO.ToList().ConvertAll(t => new ProductViewModel
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Description = t.Description,
+                StoreId = t.StoreId,
+            });
+
+            return View(view);
         }
 
         // GET: Products/Details/5
@@ -39,30 +44,34 @@ namespace TestAppLightpoint.Web.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .Include(p => p.Store)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var product = await _productService.GetSingleProductAsync((int)id);
+
+            ProductViewModel productView = new ProductViewModel()
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                StoreId = product.StoreId
+            };
             if (product == null)
             {
                 return NotFound();
             }
 
-            return View(product);
+            return View(productView);
         }
 
         // GET: Products/Create
         public IActionResult Create(int storeId)
         {
-            Product product = new Product
+            var id = new ProductViewModel()
             {
                 StoreId = storeId
             };
-            return View(product);
+            return View(id);
         }
 
         // POST: Products/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(int storeId, ProductViewModel viewModel)
@@ -71,14 +80,12 @@ namespace TestAppLightpoint.Web.Controllers
             {
                 ProductDTO productDTO = new ProductDTO
                 {
-
                     Name = viewModel.Name,
                     Description = viewModel.Description,
                     StoreId = storeId,
-                    Store = await _storeService.GetSingleStoreAsync(storeId)
                 };
                 await _productService.CreateProductAsync(productDTO);
-                return RedirectToAction(nameof(Index)); ;
+                return RedirectToAction("Index", "Stores");
             }
             else return View();
         }
@@ -92,21 +99,25 @@ namespace TestAppLightpoint.Web.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products.FindAsync(id);
+            var product = await _productService.GetSingleProductAsync((int)id);
+            var viewProduct = new ProductViewModel()
+            {
+                Name = product.Name,
+                Description = product.Description,
+                StoreId = product.StoreId,
+
+            };
             if (product == null)
             {
                 return NotFound();
             }
-            ViewData["StoreId"] = new SelectList(_context.Stores, "Id", "Id", product.StoreId);
-            return View(product);
+            return View(viewProduct);
         }
 
         // POST: Products/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,StoreId")] Product product)
+        public async Task<IActionResult> Edit(int id, ProductViewModel product)
         {
             if (id != product.Id)
             {
@@ -117,23 +128,21 @@ namespace TestAppLightpoint.Web.Controllers
             {
                 try
                 {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
+                    ProductDTO productUpdate = new ProductDTO()
+                    {
+                        Id = product.Id,
+                        Name = product.Name,
+                        Description = product.Description,
+                        StoreId = product.StoreId
+                    };
+                    await _productService.UpdateProduct(productUpdate);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductExists(product.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["StoreId"] = new SelectList(_context.Stores, "Id", "Id", product.StoreId);
             return View(product);
         }
 
@@ -145,15 +154,20 @@ namespace TestAppLightpoint.Web.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .Include(p => p.Store)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var product = await _productService.GetSingleProductAsync((int)id);
+            var viewProduct = new ProductViewModel()
+            {
+                Name = product.Name,
+                Description = product.Description,
+                StoreId = product.StoreId,
+
+            };
             if (product == null)
             {
                 return NotFound();
             }
 
-            return View(product);
+            return View(viewProduct);
         }
 
         // POST: Products/Delete/5
@@ -161,15 +175,11 @@ namespace TestAppLightpoint.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
+
+            await _productService.DeleteProductAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.Id == id);
-        }
+
     }
 }

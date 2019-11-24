@@ -8,6 +8,6 @@ namespace TestAppLightpoint.BLL.DTO
         public string Name { get; set; }
         public string Description { get; set; }
         public int? StoreId { get; set; }
-        public Store Store { get; set; }
+        public StoreDTO Store { get; set; }
     }
 }

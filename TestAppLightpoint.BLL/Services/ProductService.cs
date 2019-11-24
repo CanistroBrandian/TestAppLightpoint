@@ -11,13 +11,11 @@ namespace TestAppLightpoint.BLL.Services
 {
     public class ProductService : IProductService
     {
-        private readonly IUnitOfWork _uow;
         private readonly IProductRepository _repositoryProduct;
         private readonly IStoreRepository _repositoryStore;
 
-        public ProductService(IUnitOfWork unitOfWork, IProductRepository repoProduct, IStoreRepository repoStore)
+        public ProductService(IProductRepository repoProduct, IStoreRepository repoStore)
         {
-            _uow = unitOfWork;
             _repositoryProduct = repoProduct;
             _repositoryStore = repoStore;
         }
@@ -32,7 +30,6 @@ namespace TestAppLightpoint.BLL.Services
                     StoreId = item.StoreId
                 };
                 await _repositoryProduct.CreateAsync(newProduct);
-                _uow.Commit();
             }
             else throw new Exception("Данные не заполнены");
         }
@@ -47,7 +44,6 @@ namespace TestAppLightpoint.BLL.Services
             };
 
             await _repositoryProduct.CreateAsync(product);
-            _uow.Commit();
         }
 
         public async Task<IEnumerable<ProductDTO>> GetAllProductsOfStore(int StoreId)
@@ -61,7 +57,6 @@ namespace TestAppLightpoint.BLL.Services
                 Name = t.Name,
                 Description = t.Description,
                 StoreId = t.StoreId,
-                Store = t.Store
             });
 
             return listProductDTOs;
@@ -70,31 +65,44 @@ namespace TestAppLightpoint.BLL.Services
         public async Task DeleteProductAsync(int id)
         {
             await _repositoryProduct.DeleteAsync(id);
-            _uow.Commit();
         }
 
-        public async Task<IEnumerable<Product>> GetAllProductAsync()
+        public async Task<IEnumerable<ProductDTO>> GetAllProductAsync()
         {
-            return await _repositoryProduct.GetAllAsync();
+            var listProducts =  await _repositoryProduct.GetAllAsync();
+            IEnumerable<ProductDTO> listProductDTOs = listProducts.ToList().ConvertAll(t => new ProductDTO
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Description = t.Description,
+                StoreId = t.StoreId,
+            });
+            return listProductDTOs;
         }
 
-        public Task<Product> GetSingleProductAsync(int id)
+        public async Task<ProductDTO> GetSingleProductAsync(int id)
         {
-            throw new NotImplementedException();
+            var product = await _repositoryProduct.GetSingleAsync(id);
+            ProductDTO productDTO = new ProductDTO()
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                StoreId = product.StoreId
+            };
+            return productDTO;
         }
 
-        public void UpdateProduct(ProductDTO item)
+        public async Task UpdateProduct(ProductDTO item)
         {
-            var sourceProduct = _repositoryProduct.GetSingleAsync(item.Id);
+            var sourceProduct = await _repositoryProduct.GetSingleAsync(item.Id);
+
 
             if (sourceProduct != null)
             {
-                Product product = new Product()
-                {
-                    Name = item.Name,
-                    Description = item.Description
-                };
-                _repositoryProduct.Update(product);
+                sourceProduct.Name = item.Name;
+                sourceProduct.Description = item.Description;              
+                _repositoryProduct.Update(sourceProduct);
             }
             else throw new Exception("Такой записи нет");
         }

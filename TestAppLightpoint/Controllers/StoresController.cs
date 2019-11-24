@@ -3,52 +3,69 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TestAppLightpoint.BLL.DTO;
 using TestAppLightpoint.BLL.Interfaces;
 using TestAppLightpoint.DAL.EF;
-using TestAppLightpoint.DAL.Entities;
 using TestAppLightpoint.Web.Models;
 
 namespace TestAppLightpoint.Web.Controllers
 {
     public class StoresController : Controller
     {
-        private readonly EFContext _context;
         private readonly IProductService _productService;
         private readonly IStoreService _storeService;
 
 
-        public StoresController(EFContext context, IProductService productService,IStoreService storeService)
+        public StoresController(IProductService productService, IStoreService storeService)
         {
             _productService = productService;
             _storeService = storeService;
-            _context = context;
+ 
         }
 
         // GET: Stores
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Stores.ToListAsync());
+           var listDTO = await _storeService.GetAllStoreAsync();
+            IEnumerable<StoreViewModel> lisViewModel = listDTO.ToList().ConvertAll(t => new StoreViewModel
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Address = t.Address,
+                OpeningTimes = t.OpeningTimes,
+            });
+            return View(lisViewModel);
         }
 
         // GET: Stores/Details/5
         public async Task<IActionResult> Details(int id)
         {
-          
-            var productDTOs = await _productService.GetAllProductsOfStore(id);
+            if (id != 0)
+            {
+                var productDTOs = await _productService.GetAllProductsOfStore(id);
+                var store = await _storeService.GetSingleStoreAsync(id);
+                IEnumerable<ProductViewModel> view = productDTOs.ToList().ConvertAll(t => new ProductViewModel
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    Description = t.Description,
+                    StoreId = t.StoreId,
+                }) ;
 
-            IEnumerable<ProductViewModel> view = productDTOs.ToList().ConvertAll(t => new ProductViewModel
-            {
-                Id = t.Id,
-                Name = t.Name,
-                Description = t.Description,
-                StoreId = t.StoreId,                
-            });
-            if (productDTOs == null)
-            {
-                return NotFound();
+                ProductListViewModel viewList = new ProductListViewModel
+                {
+                    ListProduct = view,
+                    Store = store
+                };
+
+                if (productDTOs == null)
+                {
+                    return NotFound();
+                }
+
+                return View(viewList);
             }
-
-            return View(view);
+            return NotFound();
         }
 
         // GET: Stores/Create
@@ -58,22 +75,26 @@ namespace TestAppLightpoint.Web.Controllers
         }
 
         // POST: Stores/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Store store)
+        public async Task<IActionResult> Create(StoreViewModel store)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(store);
-                await _context.SaveChangesAsync();
+                StoreDTO storeDTO = new StoreDTO()
+                {
+                    Id = store.Id,
+                    Address = store.Address,
+                    Name = store.Name,
+                    OpeningTimes = store.OpeningTimes
+                };
+                await _storeService.CreateStoreAsync(storeDTO);
                 return RedirectToAction(nameof(Index));
             }
             return View(store);
         }
 
-       
+
 
         // GET: Stores/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -83,20 +104,26 @@ namespace TestAppLightpoint.Web.Controllers
                 return NotFound();
             }
 
-            var store = await _context.Stores.FindAsync(id);
+
+            var store = await _storeService.GetSingleStoreAsync((int)id);
+            StoreViewModel storeViewModel = new StoreViewModel()
+            {
+                Id = store.Id,
+                Name = store.Name,
+                OpeningTimes = store.OpeningTimes,
+                Address = store.Address
+            };
             if (store == null)
             {
                 return NotFound();
             }
-            return View(store);
+            return View(storeViewModel);
         }
 
         // POST: Stores/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Address,OpeningTimes")] Store store)
+        public async Task<IActionResult> Edit(int id, StoreViewModel store)
         {
             if (id != store.Id)
             {
@@ -107,19 +134,25 @@ namespace TestAppLightpoint.Web.Controllers
             {
                 try
                 {
-                    _context.Update(store);
-                    await _context.SaveChangesAsync();
+                    StoreDTO storeDTO = new StoreDTO()
+                    {
+                        Id = store.Id,
+                        Name = store.Name,
+                        Address = store.Address,
+                        OpeningTimes = store.OpeningTimes
+                    };
+                    await _storeService.UpdateStore(storeDTO);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!StoreExists(store.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    //if (!StoreExists(store.Id))
+                    //{
+                    //    return NotFound();
+                    //}
+                    //else
+                    //{
+                    //    throw;
+                    //}
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -134,14 +167,21 @@ namespace TestAppLightpoint.Web.Controllers
                 return NotFound();
             }
 
-            var store = await _context.Stores
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var store = await _storeService.GetSingleStoreAsync((int)id);
+
+            StoreViewModel storeViewModel = new StoreViewModel()
+            {
+                Id = store.Id,
+                Name = store.Name,
+                OpeningTimes = store.OpeningTimes,
+                Address = store.Address
+            };
             if (store == null)
             {
                 return NotFound();
             }
 
-            return View(store);
+            return View(storeViewModel);
         }
 
         // POST: Stores/Delete/5
@@ -149,15 +189,10 @@ namespace TestAppLightpoint.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var store = await _context.Stores.FindAsync(id);
-            _context.Stores.Remove(store);
-            await _context.SaveChangesAsync();
+            await _storeService.DeleteStoreAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool StoreExists(int id)
-        {
-            return _context.Stores.Any(e => e.Id == id);
-        }
+
     }
 }

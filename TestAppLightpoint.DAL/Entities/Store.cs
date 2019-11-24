@@ -2,10 +2,8 @@
 
 namespace TestAppLightpoint.DAL.Entities
 {
-    public class Store
+    public class Store :BaseEntity
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
         public string Address { get; set; }
         public string OpeningTimes { get; set; }
         public IEnumerable<Product> Products { get; set; }

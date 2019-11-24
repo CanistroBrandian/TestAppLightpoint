@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TestAppLightpoint.BLL.DTO;
 using TestAppLightpoint.BLL.Interfaces;
@@ -10,12 +11,10 @@ namespace TestAppLightpoint.BLL.Services
 {
     public class StoreService : IStoreService
     {
-        private readonly IUnitOfWork _uow;
         private readonly IStoreRepository _repositoryStore;
 
-        public StoreService(IUnitOfWork unitOfWork, IStoreRepository repo)
+        public StoreService(IStoreRepository repo)
         {
-            _uow = unitOfWork;
             _repositoryStore = repo;
         }
 
@@ -30,7 +29,6 @@ namespace TestAppLightpoint.BLL.Services
                     OpeningTimes = item.OpeningTimes
                 };
                 await _repositoryStore.CreateAsync(newStore);
-                _uow.Commit();
             }
             else throw new Exception("Данные не заполнены");
         }
@@ -38,27 +36,43 @@ namespace TestAppLightpoint.BLL.Services
         public async Task DeleteStoreAsync(int id)
         {
             await _repositoryStore.DeleteAsync(id);
-            _uow.Commit();
         }
 
-        public async Task<IEnumerable<Store>> GetAllStoreAsync()
+        public async Task<IEnumerable<StoreDTO>> GetAllStoreAsync()
         {
-            return await _repositoryStore.GetAllAsync();
+            var listStore = await _repositoryStore.GetAllAsync();
+            IEnumerable<StoreDTO> listStoreDTO = listStore.ToList().ConvertAll(t => new StoreDTO
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Address = t.Address,
+                OpeningTimes = t.OpeningTimes
+            });
+            return listStoreDTO;
         }
 
-        public async Task<Store> GetSingleStoreAsync(int id)
+        public async Task<StoreDTO> GetSingleStoreAsync(int id)
         {
-           return await _repositoryStore.GetSingleAsync(id);
+            var store = await _repositoryStore.GetSingleAsync(id);
+            StoreDTO storeDTO = new StoreDTO()
+            {
+                Id = store.Id,
+                Name = store.Name,
+                Address = store.Address,
+                OpeningTimes = store.OpeningTimes
+            };
+            return storeDTO;
         }
 
-        public void UpdateStore(StoreDTO item)
+        public async Task UpdateStore(StoreDTO item)
         {
-            var sourceStore = _repositoryStore.GetSingleAsync(item.Id);
+            var sourceStore = await _repositoryStore.GetSingleAsync(item.Id);
 
             if (sourceStore != null)
             {
                 Store store = new Store()
                 {
+                    Id = item.Id,
                     Name = item.Name,
                     Address = item.Address,
                     OpeningTimes = item.OpeningTimes

@@ -1,27 +1,24 @@
-﻿@model IEnumerable<TestAppLightpoint.Web.Models.ProductViewModel>
+﻿@model TestAppLightpoint.Web.Models.ProductListViewModel
 
-@{
-    ViewData["Title"] = "Details";
-}
 
-<h1>Details</h1>
+<h1>Список товаров</h1>
 
 <div>
-    <h4>Store</h4>
+    
     <table class="table">
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Name)
+                   <h3>Название</h3>
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Description)
+                   <h3>Описание</h3>
                 </th>
 
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var item in Model.ListProduct)
             {
                
                 <tr>
@@ -32,9 +29,9 @@
                         @Html.DisplayFor(modelItem => item.Description)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-controller="Products" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-action="Details" asp-controller="Products" asp-route-id="@item.Id">Details</a> |
-                        <a asp-action="Delete" asp-controller="Products" asp-route-id="@item.Id">Delete</a>
+                        <a asp-action="Edit" asp-controller="Products" asp-route-id="@item.Id">Редактировать</a> |
+                        <a asp-action="Details" asp-controller="Products" asp-route-id="@item.Id">Посмотреть</a> |
+                        <a asp-action="Delete" asp-controller="Products" asp-route-id="@item.Id">Удалить</a>
                     </td>
                 </tr>
             }
@@ -42,6 +39,6 @@
     </table>
 </div>
 <div>
-    <a asp-action="Create" asp-controller="Products" asp-route-storeId="@Model.ElementAtOrDefault(0).StoreId">Добавить продукт</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Create" asp-controller="Products" asp-route-storeId="@Model.Store.Id">Добавить продукт</a> |
+    <a asp-action="Index">Назад</a>
 </div>

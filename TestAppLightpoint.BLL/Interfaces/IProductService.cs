@@ -7,9 +7,9 @@ namespace TestAppLightpoint.BLL.Interfaces
 {
     public interface IProductService
     {
-        Task<IEnumerable<Product>> GetAllProductAsync();
-        Task<Product> GetSingleProductAsync(int id);
-        void UpdateProduct(ProductDTO item);
+        Task<IEnumerable<ProductDTO>> GetAllProductAsync();
+        Task<ProductDTO> GetSingleProductAsync(int id);
+        Task UpdateProduct(ProductDTO item);
         Task DeleteProductAsync(int id);
         Task CreateProductAsync(ProductDTO item);
         Task<IEnumerable<ProductDTO>> GetAllProductsOfStore(int storeId);
